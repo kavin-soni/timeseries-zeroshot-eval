@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.pyc
+data/
+figures/
+src.zip
+*.egg-info/
+HANDOFF.md
+debug_*.py
+test_*.py
