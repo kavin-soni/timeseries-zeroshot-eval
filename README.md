@@ -49,6 +49,23 @@ pip install chronos-forecasting
 # pip install timesfm  # in a Python 3.10 environment only
 ```
 
+## Data Preparation
+
+Download the raw dataset files from their original sources and place them in the repo root, then run:
+
+```bash
+python data_preprocessing.py
+```
+
+This converts each dataset from wide to long format and generates the train/test CSV splits used by all model scripts.
+
+| Dataset | Source | Raw File |
+|---------|--------|----------|
+| Traffic (PeMS) | [LSTNet](https://github.com/laujustin/LSTNet) | traffic.csv |
+| ETTh1 | [Informer](https://github.com/zhouhaoyi/ETDataset) | ETTh1.csv |
+| Exchange Rate | [LSTNet](https://github.com/laujustin/LSTNet) | exchange_rate.csv |
+| M4 Daily | [M4 Competition](https://github.com/Mcompetitions/M4-methods) | Daily-train.csv, Daily-test.csv, M4-info.csv |
+
 ## Running Experiments
 
 ### Supervised baselines (run locally)
