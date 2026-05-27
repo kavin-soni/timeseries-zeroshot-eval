@@ -8,3 +8,6 @@ src.zip
 HANDOFF.md
 debug_*.py
 test_*.py
+__pycache__/
+*.pyc
+*.pyo
