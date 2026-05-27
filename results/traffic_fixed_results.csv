@@ -1,5 +1,0 @@
-model,dataset,lookback,horizon,RMSE,sMAPE,MASE,MAE,Bias
-dlinear,traffic,168,168,0.0267,37.69,1.1647,0.0173,-3.99
-patchtst,traffic,168,168,0.0295,39.3482,1.251,0.0182,-11.24
-dlinear,traffic,168,96,0.0268,34.5456,1.0965,0.0165,-6.96
-patchtst,traffic,168,96,0.0345,40.7929,1.4175,0.0212,-16.77
