@@ -49,7 +49,7 @@ FEATURES_PATH    = os.path.join(_HERE, 'series_features.csv')
 PER_SERIES_PATH  = os.path.join(_HERE, 'per_series_results.csv')
 
 FM_MODELS          = {'timesfm25', 'chronos'}
-SPECIALIST_MODELS  = {'xgboost', 'lstm', 'patchtst', 'dlinear'}
+SPECIALIST_MODELS  = {'patchtst', 'dlinear'}
 
 FEATURE_COLS = ['spectral_entropy', 'cv', 'seasonal_autocorr', 'trend_strength']
 FEATURE_LABELS = {
@@ -193,7 +193,7 @@ def plot_feature_analysis(routing_df, pdf):
         # Clean up temp column
         routing_df.drop(columns=['_decile'], inplace=True)
 
-    fig.suptitle("FM Win Rate by Feature Decile\n(Traffic + M4; FM = best of TimesFM20/25/Chronos)",
+    fig.suptitle("FM Win Rate by Feature Decile\n(Traffic + M4; FM = best of TimesFM2.5/Chronos)",
                  fontsize=12, y=1.01)
     plt.tight_layout()
     pdf.savefig(fig, bbox_inches='tight')
@@ -261,6 +261,11 @@ def plot_pareto_frontier(routing_df, pdf):
                np.array(hybrid_mases)[pareto_mask],
                color='steelblue', s=15, zorder=3)
 
+    mase_random = [(1 - a) * pure_specialist_mase + a * pure_fm_mase for a in alphas]
+    ax.plot(relative_costs, mase_random,
+            color='gray', linestyle='--', linewidth=1.2,
+            label='Random router (sweep α)')
+
     # Knee
     ax.scatter([relative_costs[knee_i]], [hybrid_mases[knee_i]],
                color='orange', s=80, zorder=5,
@@ -324,6 +329,32 @@ def main():
             print(f"  {FEATURE_LABELS[feat]:<35} threshold ≥ {t:.4f}")
         else:
             print(f"  {FEATURE_LABELS[feat]:<35} win rate never reaches 60%")
+
+    # --- Diagnostics before Pareto plot ---
+    print("\n--- Diagnostic 1: Mean MASE per model per dataset ---")
+    print(f"  {'dataset':<12} {'model':<14} {'mean_mase':>10} {'n_series':>10}")
+    print(f"  {'-'*12} {'-'*14} {'-'*10} {'-'*10}")
+    diag1 = (per_series.groupby(['dataset', 'model'])['MASE']
+             .agg(mean_mase='mean', n_series='count')
+             .reset_index()
+             .sort_values(['dataset', 'model']))
+    for _, row in diag1.iterrows():
+        print(f"  {row['dataset']:<12} {row['model']:<14} {row['mean_mase']:>10.4f} {int(row['n_series']):>10}")
+
+    print("\n--- Diagnostic 2: Mean best_fm_mase and best_specialist_mase by dataset ---")
+    for ds in ['traffic', 'm4']:
+        sub = routing_df[routing_df['dataset'] == ds]
+        print(f"  {ds}:  best_fm_mase={sub['best_fm_mase'].mean():.4f}  "
+              f"best_specialist_mase={sub['best_specialist_mase'].mean():.4f}  "
+              f"(n={len(sub)})")
+
+    print("\n--- Diagnostic 3: best_specialist_mase distribution (all series) ---")
+    bsm = routing_df['best_specialist_mase']
+    print(f"  min={bsm.min():.4f}  max={bsm.max():.4f}  "
+          f"median={bsm.median():.4f}  mean={bsm.mean():.4f}  n={len(bsm)}")
+
+    print("\n--- Diagnostic 4: Series with best_specialist_mase < 0.5 ---")
+    print(f"  count = {(bsm < 0.5).sum()} / {len(bsm)}")
 
     # --- Plot 2: Pareto frontier ---
     pareto_pdf_path = os.path.join(_FIG_DIR, 'pareto_frontier.pdf')
