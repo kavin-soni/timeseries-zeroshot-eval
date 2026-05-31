@@ -93,9 +93,36 @@ python run_foundation_models.py --model chronos --dataset m4
 
 ```bash
 python results/extract_series_features.py
-python results/routing_analysis.py
+python results/routing_analysis.py          # full-dataset analysis
+python results/routing_analysis_holdout.py  # calibration/holdout split (paper results)
 # Figures saved to figures/
 ```
+
+## Complexity Router Evaluation
+
+The Complexity Router determines whether to send a series to a foundation model (FM) or a supervised specialist based on four time-series features. Two scripts implement this analysis:
+
+**`results/routing_analysis.py`** — Full-dataset analysis across all 5,089 series (862 Traffic + 4,227 M4). Derives routing feature thresholds and generates the FM win-rate decile figure (`figures/routing_feature_analysis.pdf`). Used for exploratory analysis only; thresholds and Pareto results are in-sample.
+
+**`results/routing_analysis_holdout.py`** — Calibration/holdout split for out-of-sample evaluation. All paper-reported numbers (MASE 0.964, α=0.29, 70% cost reduction) come from this script.
+
+| Split | Series | Purpose |
+|-------|--------|---------|
+| Calibration (40%) | 2,036 (345 Traffic + 1,691 M4) | Threshold derivation |
+| Holdout (60%) | 3,053 (517 Traffic + 2,536 M4) | Pareto frontier evaluation |
+
+Random seed: 42 (set via `np.random.default_rng(42)` for reproducibility).
+
+**Calibration routing thresholds** (FM wins when):
+
+| Feature | Condition |
+|---------|-----------|
+| Spectral Entropy | ≥ 0.1471 |
+| Coefficient of Variation | ≥ 0.2132 |
+| Seasonal Autocorrelation | < 0.9048 or ≥ 0.9902 |
+| Trend Strength (R²) | < 0.0136 |
+
+**Holdout Pareto knee**: α=0.29, cost=296×, MASE=0.964, 70.4% cost reduction vs pure FM deployment.
 
 ## Results
 
@@ -104,7 +131,7 @@ See Table 2 in the paper for full results. Key findings:
 - Foundation models outperform all supervised baselines on Traffic (periodic, high-frequency)
 - XGBoost dominates on Energy (physically constrained)
 - TimesFM 2.5 leads on Exchange Rate, suggesting newer FM architectures are closing the gap in stochastic domains
-- The Complexity Router at α=0.30 achieves better accuracy than pure FM deployment at 70% lower inference cost
+- The Complexity Router at α=0.29 achieves MASE=0.964 on the holdout set at 296× inference cost, a 70% reduction vs pure FM deployment (evaluated via `routing_analysis_holdout.py`)
 
 ## Repository Structure
 
@@ -115,9 +142,10 @@ See Table 2 in the paper for full results. Key findings:
 ├── run_patchtst_all.py             # PatchTST baseline
 ├── run_dlinear_all.py              # DLinear baseline
 ├── results/
-│   ├── extract_series_features.py  # Feature extraction
-│   ├── routing_analysis.py         # Complexity Router
-│   └── per_series_results.csv      # Per-series MASE
+│   ├── extract_series_features.py      # Feature extraction
+│   ├── routing_analysis.py             # Full-dataset router analysis
+│   ├── routing_analysis_holdout.py     # Calibration/holdout split (paper results)
+│   └── per_series_results.csv          # Per-series MASE
 ├── figures/                        # Generated plots
 └── data/                           # Dataset CSVs
 ```
