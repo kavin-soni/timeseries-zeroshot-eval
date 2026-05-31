@@ -29,6 +29,22 @@ This repository contains the code and evaluation framework for our applied study
 | Exchange Rate | Finance | Daily | 8 |
 | M4 (Daily) | General | Daily | 4227 |
 
+### Dataset Download Links
+
+**Traffic (Long-Horizon PeMS)** — 862 freeway sensor lanes, San Francisco Bay Area
+- Official source: https://pems.dot.ca.gov/
+- Commonly used preprocessed version: https://github.com/thuml/Time-Series-Library
+
+**ETTh1 (Electricity Transformer Temperature)**
+- Official source (Informer authors): https://github.com/zhouhaoyi/ETDataset
+
+**Exchange Rate (LSTNet)**
+- Official source (Lai et al. 2018): https://github.com/laiguokun/multivariate-time-series-data (`exchange_rate` folder)
+
+**M4 Daily**
+- Official M4 competition: https://github.com/Mcompetitions/M4-methods/tree/master/Dataset
+- Kaggle mirror: https://www.kaggle.com/datasets/yogesh94/m4-forecasting-competition-dataset
+
 ## Installation
 
 ### Supervised baselines (CPU, runs locally)
