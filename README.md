@@ -147,7 +147,13 @@ See Table 2 in the paper for full results. Key findings:
 - Foundation models outperform all supervised baselines on Traffic (periodic, high-frequency)
 - XGBoost dominates on Energy (physically constrained)
 - TimesFM 2.5 leads on Exchange Rate, suggesting newer FM architectures are closing the gap in stochastic domains
-- The Complexity Router at α=0.29 achieves MASE=0.964 on the holdout set at 296× inference cost, a 70% reduction vs pure FM deployment (evaluated via `routing_analysis_holdout.py`)
+- The Complexity Router has two evaluated operating points, both from `routing_analysis_holdout.py`:
+
+  - **Deployed binary router (2-of-4 majority vote):** routes 67% of holdout series to FM, matching FM-level accuracy (MASE=0.981) while eliminating 33% of FM inference calls. The four threshold conditions recover the FM-favorable population within 0.8 percentage points of oracle (67.0% vs 67.8%).
+
+  - **Oracle Pareto analysis (upper bound):** series ranked by true per-series FM advantage; knee at α=0.29, MASE=0.964, 296× cost — a 70% reduction vs pure FM deployment. Represents the maximum achievable with perfect FM-advantage knowledge. Random router at identical cost achieves MASE=1.117.
+
+  The gap (0.017 MASE) between oracle and deployed quantifies the approximation cost of binary threshold routing.
 
 ## Repository Structure
 
