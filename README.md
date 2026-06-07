@@ -120,7 +120,7 @@ The Complexity Router determines whether to send a series to a foundation model 
 
 **`results/routing_analysis.py`** — Full-dataset analysis across all 5,089 series (862 Traffic + 4,227 M4). Derives routing feature thresholds and generates the FM win-rate decile figure (`figures/routing_feature_analysis.pdf`). Used for exploratory analysis only; thresholds and Pareto results are in-sample.
 
-**`results/routing_analysis_holdout.py`** — Calibration/holdout split for out-of-sample evaluation. All paper-reported numbers (MASE 0.964, α=0.29, 70% cost reduction) come from this script.
+**`results/routing_analysis_holdout.py`** — Calibration/holdout split for out-of-sample evaluation. All paper-reported numbers come from this script: oracle Pareto (MASE=0.964, α=0.29, 70% cost reduction) and deployed binary router (MASE=0.981, 33% cost reduction).
 
 | Split | Series | Purpose |
 |-------|--------|---------|
@@ -138,7 +138,8 @@ Random seed: 42 (set via `np.random.default_rng(42)` for reproducibility).
 | Seasonal Autocorrelation | < 0.9048 or ≥ 0.9902 |
 | Trend Strength (R²) | < 0.0136 |
 
-**Holdout Pareto knee**: α=0.29, cost=296×, MASE=0.964, 70.4% cost reduction vs pure FM deployment.
+**Oracle Pareto knee**: α=0.29, cost=296×, MASE=0.964, 70.4% cost reduction vs pure FM deployment (series ranked by true per-series FM advantage).
+**Deployed binary router**: MASE=0.981, 33% cost reduction (2-of-4 majority vote on holdout).
 
 ## Results
 
